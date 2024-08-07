@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,56 +16,59 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eithanmonroy.webapp.biblioteca.model.Cliente;
-import com.eithanmonroy.webapp.biblioteca.service.ClienteService;
+import com.eithanmonroy.webapp.biblioteca.model.Empleado;
+import com.eithanmonroy.webapp.biblioteca.service.EmpleadoService;
 
 @Controller
 @RestController
 @RequestMapping("")
-public class ClienteController {
+public class EmpleadoController {
     @Autowired
-    ClienteService clienteService;
+    EmpleadoService empleadoService;
 
-    @GetMapping("/clientes")
-    public List<Cliente> listarClientes(){
-        return clienteService.listarClientes();
-            
-    }
-
-    @GetMapping("/cliente")
-    public ResponseEntity<Cliente> buscarClientePorDpi(@PathVariable Long dpi){
+    @GetMapping("/empleados")
+    public ResponseEntity<List<Empleado>> listarEmpleados() {
         try {
-            Cliente cliente = clienteService.buscarClientePorDpi(dpi);
-            return ResponseEntity.ok(cliente);
+            return ResponseEntity.ok(empleadoService.listarEmpleados());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
-            // TODO: handle exception
         }
     }
 
-    @PostMapping("/cliente")
-    public ResponseEntity<Map<String, String>> agregarCliente(@RequestBody Cliente cliente){
-        Map<String, String> response = new HashMap<>();
+    @GetMapping("/empleado")
+    public ResponseEntity <Empleado> buscarEmpleadoPorId(@RequestParam long id) {
         try {
-            clienteService.guardarCliente(cliente);
-            response.put("message", "Cliente creado con exito");
+            return ResponseEntity.ok(empleadoService.buscarEmpleadoPorId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/empleado")
+    public ResponseEntity<Map<String,String>> agregarEmpleado(@RequestBody Empleado empleado) {
+        Map<String,String> response = new HashMap<>();
+ 
+        try {
+            empleadoService.guardarEmpleado(empleado);
+            response.put("message", "Se ha creado con exito");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("Err", "Hubo un error al crear la categoria");
+            response.put("message" ,"error" );
+            response.put("err" ,"No se ha agregado el Empleado" );
             return ResponseEntity.badRequest().body(response);
-            // TODO: handle exception
         }
     }
-
-    @PutMapping("/cliente")
-    public ResponseEntity <Map<String, String>> editarCliente(@RequestParam Long dpi, @RequestBody Cliente clienteNuevo) {
+    @PutMapping("/empleado")
+    public ResponseEntity <Map<String, String>> editarEmpleado(@RequestParam Long id, @RequestBody Empleado empleadoNuevo) {
         Map<String,String> response = new HashMap<>();
         try {
-            Cliente cliente = clienteService.buscarClientePorDpi(dpi);
-            cliente.setNombre(clienteNuevo.getNombre());
-            cliente.setApellido(clienteNuevo.getApellido());
-            cliente.setTelefono(clienteNuevo.getTelefono());
-            clienteService.guardarCliente(cliente);
+            Empleado empleado = empleadoService.buscarEmpleadoPorId(id);
+            empleado.setNombre(empleadoNuevo.getNombre());
+            empleado.setApellido(empleadoNuevo.getApellido());
+            empleado.setTelefono(empleadoNuevo.getTelefono());
+            empleado.setDireccion(empleadoNuevo.getDireccion());
+            empleado.setDpi(empleadoNuevo.getDpi());
+            empleadoService.guardarEmpleado(empleado);
             response.put("message", "Se he modificado correctamente");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -75,14 +77,14 @@ public class ClienteController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-    
-    @DeleteMapping("/cliente")
-    public ResponseEntity<Map<String, String>> eliminarCliente(@RequestParam Long dpi){
+
+    @DeleteMapping("/empleado")
+    public ResponseEntity<Map<String, String>> eliminarEmpleado(@RequestParam Long id){
         Map<String, String> response = new HashMap<>();
         try {
-            Cliente cliente = clienteService.buscarClientePorDpi(dpi);
+            Empleado empleado = empleadoService.buscarEmpleadoPorId(id);
  
-            clienteService.eliminarCliente(cliente);
+            empleadoService.eliminarEmpleado(empleado);
             response.put("message", "Se ha elimnado con exito");
             return ResponseEntity.ok(response);
  
@@ -92,5 +94,7 @@ public class ClienteController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+ 
+
 
 }
