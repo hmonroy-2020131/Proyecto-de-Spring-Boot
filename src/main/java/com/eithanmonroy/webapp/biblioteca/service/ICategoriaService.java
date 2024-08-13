@@ -13,4 +13,8 @@ public interface ICategoriaService {
     public Categoria buscarCategoriaPorId(Long id);
 
     public void eliminarCategoria(Categoria categoria);
+
+    public Boolean verificarCategoriaDuplicada(Categoria categoria);
+
+
 }

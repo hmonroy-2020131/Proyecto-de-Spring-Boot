@@ -49,9 +49,16 @@ public class EmpleadoController {
         Map<String,String> response = new HashMap<>();
  
         try {
-            empleadoService.guardarEmpleado(empleado);
-            response.put("message", "Se ha creado con exito");
-            return ResponseEntity.ok(response);
+            if (!empleadoService.verificarDpiDuplicado(empleado)) {
+                 empleadoService.guardarEmpleado(empleado);
+                 response.put("message", "Se ha creado con exito");
+                 return ResponseEntity.ok(response);
+            }else{
+                response.put("message" ,"error" );
+                response.put("err", "El DPI se encuentra duplicado ");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
         } catch (Exception e) {
             response.put("message" ,"error" );
             response.put("err" ,"No se ha agregado el Empleado" );
@@ -68,9 +75,15 @@ public class EmpleadoController {
             empleado.setTelefono(empleadoNuevo.getTelefono());
             empleado.setDireccion(empleadoNuevo.getDireccion());
             empleado.setDpi(empleadoNuevo.getDpi());
-            empleadoService.guardarEmpleado(empleado);
-            response.put("message", "Se he modificado correctamente");
-            return ResponseEntity.ok(response);
+            if (!empleadoService.verificarDpiDuplicado(empleadoNuevo)) {
+                empleadoService.guardarEmpleado(empleado);     
+                response.put("message", "Se he modificado correctamente 😎");
+                return ResponseEntity.ok(response);
+            }else{
+                response.put("message" ,"error" );
+                response.put("err", "El DPI se encuentra duplicado ");
+                return ResponseEntity.badRequest().body(response);  
+            }
         } catch (Exception e) {
             response.put("message" ,"error" );
             response.put("err" ,"No se ha modificado con exito" );

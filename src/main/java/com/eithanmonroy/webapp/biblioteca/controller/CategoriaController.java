@@ -50,9 +50,14 @@ public class CategoriaController {
     public ResponseEntity<Map<String, String>> agregarCategoria(@RequestBody Categoria categoria){
         Map<String, String> response = new HashMap<>();
         try {
-            categoriaService.guardarCategoria(categoria);
-            response.put("message", "Categoria creada con exito");
-            return ResponseEntity.ok(response);
+            if (!categoriaService.verificarCategoriaDuplicada(categoria)) {
+                categoriaService.guardarCategoria(categoria);
+                response.put("message", "Categoria creada con exito");
+                return ResponseEntity.ok(response);
+            }else{
+                response.put("Err", "La categoria se encuentra duplicada");
+                return ResponseEntity.badRequest().body(response);
+            }
         } catch (Exception e) {
             response.put("Err", "Hubo un error al crear la categoria");
             return ResponseEntity.badRequest().body(response);
@@ -66,9 +71,15 @@ public class CategoriaController {
         try {
             Categoria categoria = categoriaService.buscarCategoriaPorId(id);
             categoria.setNombreCategoria(categoriaNueva.getNombreCategoria());
-            categoriaService.guardarCategoria(categoria);
-            response.put("message", "La categoria se ha modificado con éxito");
-            return ResponseEntity.ok(response);
+           if (!categoriaService.verificarCategoriaDuplicada(categoriaNueva)) {
+                categoriaService.guardarCategoria(categoria);
+                response.put("message", "La categoria se ha modificado con éxito");
+                return ResponseEntity.ok(response);
+           }else{
+                response.put("message", "Error");
+                response.put("err", "La categotia se encuentra duplicada");
+                return ResponseEntity.badRequest().body(response);
+           }
         } catch (Exception e) {
             response.put("message", "Error");
             response.put("err", "Hubo un error al intentar modificar la categoria");
